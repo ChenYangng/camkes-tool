@@ -116,7 +116,7 @@ def new_context(entity, assembly, render_state, state_key, outfile_name,
                 # an arbitrary string that will be set as the 'fill' parameter on the
                 # capDL frame object. The meaning of fill is completely dependent
                 # on the underlying loader
-                'register_fill_frame': (lambda symbol, fill, size=4096:
+                'register_fill_frame': (lambda symbol, fill, size=16384:
                                         register_fill_frame(addr_space, symbol, fill, size, obj_space, entity.label())),
 
                 'register_stack_symbol': (lambda symbol, size:
@@ -212,7 +212,7 @@ def new_context(entity, assembly, render_state, state_key, outfile_name,
                 'isabelle_event':      macros.isabelle_ADL_ident('event'),
                 'isabelle_dataport':
                     lambda name: macros.isabelle_ADL_ident('dataport')(
-                    # hack to fix up names for sized buffer types e.g. 'Buf(4096)' -> 'Buf_4096'
+                    # hack to fix up names for sized buffer types e.g. 'Buf(16384)' -> 'Buf_16384'
             re.sub(r'\((.*)\)', r'_\1', name)),
 
         'isabelle_capdl_identifier': macros.isabelle_ident,
@@ -526,7 +526,7 @@ def register_shared_variable(addr_space, obj_space, global_name, symbol, size, c
            'static_assert(sizeof(%(sym)s) %% %(frame_size)d == 0,\n'              \
            '  "%(sym)s not page-sized. Template bug in its declaration? '       \
            'Suggested formulation: `char %(sym)s[ROUND_UP_UNSAFE(sizeof(...), ' \
-           'PAGE_SIZE_4K)];`");' % {'sym': symbol, 'size': size, 'frame_size': frame_size}
+           'PAGE_SIZE_16K)];`");' % {'sym': symbol, 'size': size, 'frame_size': frame_size}
 
 
 def get_shared_variable_backing_frames(obj_space, global_name, size, frame_size=None, label=None):
@@ -556,18 +556,18 @@ def register_fill_frame(addr_space, symbol, fill, size, obj_space, label):
     Return a static_assert checking that the symbol is of the correct size
     '''
     assert addr_space
-    number_frames = size//4096
+    number_frames = size//16384
     digits = str(int(log10(number_frames + 1)) + 1)
     namefmt = '%s_%s_%0' + digits + 'd_obj'
     frames = []
     for i in range(number_frames):
-        fill_str = ['%d %d %s %d' % (0, 4096 if (size - (i * 4096)) >=
-                                     4096 else (size - (i * 4096)), fill, i * 4096)]
+        fill_str = ['%d %d %s %d' % (0, 16384 if (size - (i * 16384)) >=
+                                     16384 else (size - (i * 16384)), fill, i * 16384)]
         name = namefmt % (symbol, label, i)
         frames.append(obj_space.alloc(ObjectType.seL4_FrameObject,
-                                      name=name, label=label, fill=fill_str, size=4096))
+                                      name=name, label=label, fill=fill_str, size=16384))
     caps = [Cap(frame, read=True, write=False, grant=False) for frame in frames]
-    sizes = [4096] * number_frames
+    sizes = [16384] * number_frames
     addr_space.add_symbol_with_caps(symbol, sizes, caps)
     return 'static_assert(sizeof(%(sym)s) == %(size)s,\n'           \
            ' "%(sym)s not page sized. Templage bug in its declaration?");'  \
@@ -581,13 +581,13 @@ def register_stack_symbol(addr_space, symbol, size, obj_space, label):
     Stack frames are read, write mappings.
     '''
     assert addr_space
-    number_frames = size//4096
+    number_frames = size//16384
     digits = str(int(log10(number_frames + 1)) + 1)
     namefmt = 'stack_%s_%0' + digits + 'd_%s_obj'
-    frames = [obj_space.alloc(ObjectType.seL4_FrameObject, name=namefmt % (symbol, i, label), label=label, size=4096)
+    frames = [obj_space.alloc(ObjectType.seL4_FrameObject, name=namefmt % (symbol, i, label), label=label, size=16384)
               for i in range(number_frames)]
     # We create 2 additional mappings with None caps that are for the guard pages.
-    sizes = [4096] * (number_frames + 2)
+    sizes = [16384] * (number_frames + 2)
     caps = [None] + [Cap(frame, read=True, write=True, grant=False) for frame in frames] + [None]
     addr_space.add_symbol_with_caps(symbol, sizes, caps)
 
@@ -602,7 +602,7 @@ def register_ipc_symbol(addr_space, symbol, frame):
     assert addr_space
     # We create 3*4K mappings with None on each side of the IPC buffer for guard pages
     caps = [None, Cap(frame, read=True, write=True, grant=False), None]
-    sizes = [4096] * 3
+    sizes = [16384] * 3
     addr_space.add_symbol_with_caps(symbol, sizes, caps)
 
 

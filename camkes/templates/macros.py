@@ -78,7 +78,7 @@ def next_page_multiple(size, arch):
     '''
     multiple = page_sizes(arch)[0]
     while size > multiple:
-        multiple += 4096
+        multiple += 16384
     return multiple
 
 
@@ -260,7 +260,7 @@ def show_includes(xs, prefix=''):
     return s
 
 
-PAGE_SIZE = 4096
+PAGE_SIZE = 16384
 
 
 def threads(composition, instance, configuration, options):
@@ -358,7 +358,7 @@ NO_CHECK_UNUSED.add('ROUND_DOWN')
 
 _sizes = {
     # The sizes of a few things we know statically.
-    'Buf': 4096,
+    'Buf': 16384,
     'int8_t': 1,
     'uint8_t': 1,
     'int16_t': 2,

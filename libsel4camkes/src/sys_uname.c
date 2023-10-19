@@ -70,6 +70,10 @@ long camkes_sys_uname(va_list ap)
     arch = "RISC-V";
     arch_ver = ", " STRINGIFY(CONFIG_SEL4_ARCH);
 
+#elif defined(CONFIG_ARCH_LOONGARCH)
+    arch = "LOONGARCH";
+    arch_ver = ", " STRINGIFY(CONFIG_SEL4_ARCH); 
+
 #elif defined(CONFIG_ARCH_IA32) || defined(CONFIG_ARCH_X86_64)
     arch = STRINGIFY(CONFIG_SEL4_ARCH);
     arch_ver = "";

@@ -41,8 +41,8 @@
     /*- set symbol = 'extra_bootinfo_frame_%d' % loop.index0 -*/
     struct {
         char content[PAGE_SIZE_4K];
-    } /*? symbol ?*/ ALIGN(PAGE_SIZE_4K) SECTION("align_12bit");
-    /*- do register_fill_frame(symbol, 'CDL_FrameFill_BootInfo %s' % name, 4096) -*/
+    } /*? symbol ?*/ ALIGN(PAGE_SIZE_4K) SECTION("align_14bit");
+    /*- do register_fill_frame(symbol, 'CDL_FrameFill_BootInfo %s' % name, 16384) -*/
     /*- do extrabi_list.append((name, symbol)) -*/
 /*- endfor -*/
 
@@ -380,6 +380,8 @@ static seL4_Error simple_camkes_set_ASID(void *data, seL4_CPtr vspace) {
         return seL4_X86_ASIDPool_Assign(/*? asidpool ?*/, vspace);
 #elif CONFIG_ARCH_ARM
         return seL4_ARM_ASIDPool_Assign(/*? asidpool ?*/, vspace);
+#elif CONFIG_ARCH_LOONGARCH
+        return seL4_LOONGARCH_ASIDPool_Assign(/*? asidpool ?*/, vspace);
 #endif
     /*- else -*/
         return seL4_FailedLookup;
@@ -405,11 +407,28 @@ static uintptr_t make_frame_get_paddr(seL4_CPtr untyped) {
     int type;
     int error;
     uintptr_t ret;
-    type = seL4_ARCH_4KPage;
-#ifdef CONFIG_KERNEL_STABLE
-    error = seL4_Untyped_RetypeAtOffset(untyped, type, 0, 12, /*? self_cnode ?*/, 0, 0, /*? holding_slot ?*/, 1);
+#ifdef CONFIG_ARCH_LOONGARCH
+    type = seL4_ARCH_16KPage;
 #else
-    error = seL4_Untyped_Retype(untyped, type, 12, /*? self_cnode ?*/, 0, 0, /*? holding_slot ?*/, 1);
+    type = seL4_ARCH_4KPage;
+#endif
+
+#ifdef CONFIG_KERNEL_STABLE
+    error = seL4_Untyped_RetypeAtOffset(untyped, type, 0, 
+                                        #ifdef CONFIG_ARCH_LOONGARCH
+                                        14,
+                                        #else
+                                        12, 
+                                        #endif
+                                        /*? self_cnode ?*/, 0, 0, /*? holding_slot ?*/, 1);
+#else
+    error = seL4_Untyped_Retype(untyped, type, 
+                                #ifdef CONFIG_ARCH_LOONGARCH
+                                14,
+                                #else
+                                12, 
+                                #endif
+                                /*? self_cnode ?*/, 0, 0, /*? holding_slot ?*/, 1);
 #endif
     ERR_IF(error != seL4_NoError, camkes_error, ((camkes_error_t){
             .type = CE_SYSCALL_FAILED,

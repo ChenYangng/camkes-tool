@@ -170,7 +170,7 @@ function(set_camkes_render_flags_from_config list)
 
     set_config_guard(
         CAmkESLargeFramePromotion
-        ON
+        OFF
         CACHE
         BOOL
         "Some hardware platforms support multiple page sizes. In components with

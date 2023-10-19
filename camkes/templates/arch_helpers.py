@@ -10,7 +10,7 @@ Helpers for accessing architecture-specific information
 
 
 def is_64_bit_arch(arch):
-    return arch in ('x86_64', 'aarch64', 'riscv64')
+    return arch in ('x86_64', 'aarch64', 'riscv64', 'loongarch64')
 
 
 def is_arch_arm(arch):

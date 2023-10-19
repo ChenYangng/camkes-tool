@@ -22,16 +22,16 @@
 /*- set dataport_symbol_name = "%s_%d_%s_data" % (end, index, me.interface.name) -*/
 /*- set type_size = macros.dataport_size(me.interface.type) -*/
 /*- if type_size.startswith("sizeof") -*/
-   /*- set size = configuration[me.parent.name].get('size', 4096) -*/
+   /*- set size = configuration[me.parent.name].get('size', 16384) -*/
    /*- set page_size = macros.get_page_size(size, options.architecture) -*/
    /*- if page_size == 0 -*/
-     /*? raise(TemplateError('Setting %s.size does not meet minimum size requirements. %d must be at least %d and %d aligned' % (me.parent.name, int(size), 4096, 4096))) ?*/
+     /*? raise(TemplateError('Setting %s.size does not meet minimum size requirements. %d must be at least %d and %d aligned' % (me.parent.name, int(size), 16384, 16384))) ?*/
    /*- endif -*/
 /*- else -*/
    /*- set size = type_size -*/
    /*- set page_size = macros.get_page_size(size, options.architecture) -*/
    /*- if page_size == 0 -*/
-     /*? raise(TemplateError('Setting Buf(%d) does not meet minimum size requirements. %d must be at least %d and %d aligned' % (int(size), int(size), 4096, 4096))) ?*/
+     /*? raise(TemplateError('Setting Buf(%d) does not meet minimum size requirements. %d must be at least %d and %d aligned' % (int(size), int(size), 16384, 16384))) ?*/
    /*- endif -*/
 /*- endif -*/
 

@@ -25,7 +25,7 @@ set(
     "utils"
     "sel4vka"
     "sel4utils"
-    "sel4bench"
+    # "sel4bench"
     "sel4platsupport"
     "platsupport"
     "sel4vspace"
@@ -368,7 +368,7 @@ RequireFile(CONFIGURE_FILE_SCRIPT configure_file.cmake PATHS ${CMAKE_MODULE_PATH
     add_dependencies(${target} ${gen_target} CAmkESComponent_/*? i.type.name ?*/)
     # Set our CAmkES specific additional link flags
     set_property(TARGET ${target} APPEND_STRING PROPERTY LINK_FLAGS
-        " -static -nostdlib -u _camkes_start -e _camkes_start ")
+        " -static -nostdlib -u _camkes_start -e _camkes_start -z max-page-size=16384 ")
     # Add extra flags specified by the user
     target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:C>:${extra_c_flags} ${CAMKES_C_FLAGS}>)
     target_compile_options(${target} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:${extra_cxx_flags} ${CAMKES_CXX_FLAGS}>)

@@ -174,7 +174,7 @@ void camkes_show_fault(seL4_MessageInfo_t info, seL4_CPtr thread_id,
     }
 
         case seL4_Fault_UnknownSyscall:
-            show_unknown_syscall_fault(thread_id, name);
+            // show_unknown_syscall_fault(thread_id, name);
             break;
 
         case seL4_Fault_UserException: {

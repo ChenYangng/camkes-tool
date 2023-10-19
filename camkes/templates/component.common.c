@@ -123,10 +123,10 @@ int get_instance_affinity(void) {
 /*# Output flags to get the loader to copy the DTB over #*/
 /*- if len(dtb_dict) -*/
     /*- set dtb_size = dtb_dict[0]['dtb_size'][0] -*/
-    /*# Calculate the multiple of 4K pages that can fit the DTB, add an extra for the bootinfo header #*/
-    /*- set rounded_size = macros.ROUND_UP(dtb_size, 4096) + 4096 -*/
+    /*# Calculate the multiple of 16K pages that can fit the DTB, add an extra for the bootinfo header #*/
+    /*- set rounded_size = macros.ROUND_UP(dtb_size, 16384) + 16384 -*/
     char dtb_symbol[/*? rounded_size ?*/]
-    ALIGN(PAGE_SIZE_4K) SECTION("align_12bit");
+    ALIGN(PAGE_SIZE_4K) SECTION("align_14bit");
     /*- do register_fill_frame('dtb_symbol', 'CDL_FrameFill_BootInfo CDL_FrameFill_BootInfo_FDT', rounded_size) -*/
 /*- endif -*/
 
